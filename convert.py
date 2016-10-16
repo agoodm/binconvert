@@ -47,7 +47,7 @@ def write_to_config_file(configfile, formats):
 
 def gen_format_string(formats, size=None):
     """
-    Generate a format string specifying the a byte alignment given a list of the
+    Generate a format string specifying the byte alignment given a list of the
     form ["<pattern1>:<count1>", "<pattern2>:<count2>", ...]. For example,
 
     >>> gen_format_string(["id4s:2", "f2d"])
