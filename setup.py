@@ -1,8 +1,6 @@
 from setuptools import setup
 import os
 
-THIS_DIR = os.path.dirname(__file__)
-
 try:
     import pypandoc
     _long_description = pypandoc.convert(

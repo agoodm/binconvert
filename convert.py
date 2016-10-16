@@ -183,7 +183,7 @@ def convert(source, destination=None, byte_order=None, fmt='*'):
         given by source will be assumed to be formatted in the opposite
         byte order.
     fmt: str, optional
-        Format string. See documenation for the python struct module for
+        Format string. See documentation for the python struct module for
         valid examples. The string should span the entire size of the file you
         are converting. The default format is "Nc", where N is the size of the
         file in bytes. Thus the bytes of the entire file are reversed in one go.
