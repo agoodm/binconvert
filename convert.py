@@ -101,7 +101,7 @@ def gen_format_string(formats, size=None, expand=False):
 
         # count is 1 if not given.
         if len(pattern_info) == 1:
-            cumsize += struct.calcsize(pattern)
+            cumsize += struct.calcsize('=' + pattern)
             fmt += pattern
         elif pattern_info[1][-1] == '*':
             if special_pattern:
@@ -117,7 +117,7 @@ def gen_format_string(formats, size=None, expand=False):
         else:
             count = int(pattern_info[1])
             result = count*pattern
-            cumsize += struct.calcsize(result)
+            cumsize += struct.calcsize('=' + result)
             fmt += result
 
     # We are now ready to allocate the remaining bytes
@@ -129,7 +129,7 @@ def gen_format_string(formats, size=None, expand=False):
 
         # Calculate the count such that pattern evenly fits in remaining size
         remaining = size - cumsize
-        chunksize = struct.calcsize(special_pattern)
+        chunksize = struct.calcsize('=' + special_pattern)
         count = remaining / chunksize
         if remaining % chunksize != 0:
             raise struct.error('Given chunksize of {0} bytes does not divide '
@@ -174,16 +174,16 @@ def convert(source, destination=None, byte_order=None, fmt=None):
     ----------
     source : str
         The path to the binary file to be converted.
-    destination: str, optional
+    destination : str, optional
         The path to the converted output file. If not specified, source is
         overwritten.
-    byte_order: {None, 'little', 'big'}
+    byte_order : {None, 'little', 'big'}
         The byte order to convert to (endianness). If not specified, the
         native byte ordering of your platform is used (eg, 'little' on x86).
         "Do nothing" conversion operations are not allowed, so the input file
         given by source will be assumed to be formatted in the opposite
         byte order.
-    fmt: str, optional
+    fmt : str, optional
         Format string. See documentation for the python struct module for
         valid examples. The string should span the entire size of the file you
         are converting. The default format is "Nh", where N is half the size of
