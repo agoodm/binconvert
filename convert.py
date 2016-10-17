@@ -90,10 +90,6 @@ def gen_format_string(formats, size=None, expand=False):
         Formats list with wildcard count expanded to actual counts
         if expand is True.
     """
-    # Fallback format
-    if formats == ['*']:
-        return '*', formats
-
     fmt = ''
     # Use this to keep track of size expended by format so far.
     cumsize = 0
@@ -156,7 +152,7 @@ def gen_format_string(formats, size=None, expand=False):
     return fmt, formats
 
 
-def convert(source, destination=None, byte_order=None, fmt='*'):
+def convert(source, destination=None, byte_order=None, fmt=None):
     """
     Converts the given file (specified by source) from one byte order
     to another. For example, to convert a file in the current working directory
@@ -190,14 +186,15 @@ def convert(source, destination=None, byte_order=None, fmt='*'):
     fmt: str, optional
         Format string. See documentation for the python struct module for
         valid examples. The string should span the entire size of the file you
-        are converting. The default format is "Nc", where N is the size of the
-        file in bytes. Thus the bytes of the entire file are reversed in one go.
+        are converting. The default format is "Nh", where N is half the size of
+        the file in bytes, swapping each even and odd byte. For this case, the
+        total size of the file in bytes must be even.
     """
     # This format string gives the number of bytes and type
     # for each piece of data in the record.
-    if fmt == '*':
+    if fmt is None:
         num = os.path.getsize(source)
-        fmt = num*'c'
+        fmt = '{0}h'.format(num/2)
 
     # Set default destination path to source (overwrite)
     if destination is None:
@@ -338,7 +335,7 @@ def main():
             formats = read_from_config_file(configfile)
         except IOError as e:
             # Do this in case default config file is corrupted or doesn't exist.
-            formats = ['*']
+            formats = ['h:*']
 
     # Finally we can generate the full format string
     try:
