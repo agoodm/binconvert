@@ -6,6 +6,8 @@ import struct
 import sys
 import yaml
 
+__version__ = '0.1.0'
+
 def read_from_config_file(configfile):
     """
     Read the format patterns from the given YAML configuration file.
@@ -45,7 +47,7 @@ def write_to_config_file(configfile, formats):
         yaml.dump({'formats': formats}, f, default_flow_style=False)
 
 
-def gen_format_string(formats, size=None):
+def gen_format_string(formats, size=None, expand=False):
     """
     Generate a format string specifying the byte alignment given a list of the
     form ["<pattern1>:<count1>", "<pattern2>:<count2>", ...]. For example,
@@ -74,13 +76,19 @@ def gen_format_string(formats, size=None):
     size : int, optional
         size of the source file in bytes. Only needed if wilcard '*' character
         is used in counts.
+    expand : bool, optional
+        If True, expand the wildcard in the output formats list. This should be
+        left False (default) if you are working with many binary files with a
+        common format patterns but of different size. This does nothing is size
+        is None (ie no source file is given).
 
     Returns
     -------
     fmt : str
         The full format string.
     formats : list of str
-        Formats list with wildcards expanded to actual counts.
+        Formats list with wildcard count expanded to actual counts
+        if expand is True.
     """
     # Fallback format
     if formats == ['*']:
@@ -119,10 +127,9 @@ def gen_format_string(formats, size=None):
     # We are now ready to allocate the remaining bytes
     # for the special '*' pattern.
     if special_pattern:
-        # Make sure source is specified.
+        # Make sure source is specified, otherwise return.
         if size is None:
-            raise struct.error('source must be specified if wildcard (*) '
-                               'character is in format counts.')
+            return fmt, formats
 
         # Calculate the count such that pattern evenly fits in remaining size
         remaining = size - cumsize
@@ -136,11 +143,9 @@ def gen_format_string(formats, size=None):
         result = count*special_pattern
         fmt = fmt.format(result)
 
-        # Update formats list to expand * character. This is needed because otherwise
-        # the executable script will not run if the format saved in a config file
-        # contains the * character when source is not given in the script
-        # (eg, bconv is ran only to manipulate the defaultformat string)
-        formats[special_index] = formats[special_index].replace('*', str(count))
+        # Update formats list to expand * character.
+        if expand:
+            formats[special_index] = formats[special_index].replace('*', str(count))
 
     # Final sanity check: Ensure format string size and source file size match.
     fmt_size = struct.calcsize('=' + fmt)
@@ -259,6 +264,16 @@ def main():
                         help='Print the currently used format string. Omitting'
                         ' all other arguments prints the format string stored in'
                         ' the ~/.bconv file that comes with this program.')
+    parser.add_argument('-v', '--version', action='store_true',
+                        help='Print current version of this program and exit.')
+    parser.add_argument('-e', '--expand', action='store_true',
+                        help='If set, the special wildcard (*) count will not'
+                        ' be replaced after the actual format pattern count is'
+                        ' is calculated. This behavior is not the default because'
+                        ' more often than not, uses cases involve multiple binary'
+                        ' files with different sizes but common format patterns'
+                        ' which make it more convenient to keep the "*" count intact'
+                        ' if setting it as the default format with -d.')
 
     # Now process the arguments
     args = parser.parse_args()
@@ -266,8 +281,12 @@ def main():
     # Print help message if arguments are default.
     if not (args.source or args.destination or args.order or args.big
             or args.little or args.format or args.store or args.configfile
-            or args.printf):
+            or args.printf or args.version or args.expand):
         parser.print_usage()
+        sys.exit()
+
+    if args.version:
+        print(__version__)
         sys.exit()
 
     # Input file
@@ -299,7 +318,7 @@ def main():
         byte_order = args.order
 
     # Format string
-    configfile = os.join(os.path.expanduser('~'), '.bconvrc')
+    configfile = os.path.join(os.path.expanduser('~'), '.bconvrc')
     if args.format and args.configfile:
         parser.error('Multiple format strings specified, please use only one of'
                      ' -f and -c when overriding default format.')
@@ -323,9 +342,9 @@ def main():
 
     # Finally we can generate the full format string
     try:
-        fmt, expanded_formats = gen_format_string(formats, size)
+        fmt, expanded_formats = gen_format_string(formats, size, args.expand)
     except struct.error as e:
-        paraser.error(e)
+        parser.error(e)
 
     # Store default format in config file
     if args.store or (args.format is None and expanded_formats != formats):
@@ -333,7 +352,8 @@ def main():
 
     # Print the format string
     if args.printf:
-        print('Current format: {0}'.format(fmt))
+        print(yaml.dump({'Current Formats': formats},
+                        default_flow_style=False)[:-1])
 
     # If source isn't given, we're done.
     if not source:

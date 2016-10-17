@@ -1,5 +1,8 @@
-from setuptools import setup
 import os
+import re
+from setuptools import setup
+
+import convert
 
 try:
     import pypandoc
@@ -13,10 +16,11 @@ except(IOError, ImportError):
 
 _author = 'Alex Goodman'
 _email = 'alexander.goodman@jpl.nasa.gov'
+_version = convert.__version__
 
 setup(
     name =            	'binconvert',
-    version =         	'0.1.0',
+    version =           _version,
     description =     	'Converts byte ordering in binary files from one '
                         'platform to another',
     long_description = 	_long_description,
