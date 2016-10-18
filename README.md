@@ -23,18 +23,25 @@ In summary, `binconvert`'s main purpose is to extend the functionality of the py
 1. Make it easier to generate format strings for larger files.
 2. Provide a simple CLI interface for performing the endianness conversion.
 
-# Installation and Usage
-To install `binconvert` from the current codebase, you may use
-
+# Installation
+## Release Versions
+To install the latest release version of `binconvert`, use `pip`:
+```sh
+pip install binconvert
+```
+In the near future, an installation method using `conda` will also be provided.
+## From Source
+To install from the latest codebase, use:
 ```sh
 git clone https://github.com/agoodm/binconvert.git
 cd binconvert
 python setup.py install
 ```
 
+# Usage
 If all goes well, you should be able to execute the program with:
 ```sh
-bconv -h
+bconv
 ```
 
-In the near future, installation methods using `pip` and `conda` will be provided.
+For further documentation, use the `-h` switch (`bconv -h`).
