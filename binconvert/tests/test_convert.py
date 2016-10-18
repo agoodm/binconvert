@@ -39,7 +39,7 @@ class TestConvert(unittest.TestCase):
 
     def setUp(self):
         self.fmt = '3s3si3si'
-        self.formats = ['3s', '3si:*']
+        self.formats = ['3s', '3si:#']
         self.lsource = 'l.bin'
         self.bsource = 'b.bin'
         self.content = ('foo', 'bar', 26, 'baz', 32)
