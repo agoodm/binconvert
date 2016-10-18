@@ -1,8 +1,8 @@
 import os
 import re
-from setuptools import setup
+from setuptools import setup, find_packages
 
-import convert
+import binconvert
 
 try:
     import pypandoc
@@ -16,7 +16,7 @@ except(IOError, ImportError):
 
 _author = 'Alex Goodman'
 _email = 'alexander.goodman@jpl.nasa.gov'
-_version = convert.__version__
+_version = binconvert.__version__
 
 setup(
     name =            	'binconvert',
@@ -32,8 +32,10 @@ setup(
     platforms =         ['any'],
     install_requires =  ['pyyaml'],
     license =           'MIT',
-    test_suite =        'tests',
+    tests_require  =    ['nose'],
+    test_suite =        'nose.collector',
     include_package_data = True,
+    packages =          find_packages(),
     package_data =      {
         '': ['README.md', 'LICENSE']
     },
@@ -55,7 +57,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
     zip_safe = False,
-    py_modules=['convert'],
     entry_points={
-        'console_scripts': ['bconv = convert:main',],
+        'console_scripts': ['bconv = binconvert.cli.script:main',],
     })

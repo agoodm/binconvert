@@ -1,4 +1,4 @@
-import convert
+from .. import convert, utils
 import os
 import struct
 import sys
@@ -67,7 +67,7 @@ class TestConvert(unittest.TestCase):
 
         self.gen_binary_file('test.bin', '\xab\xcd',
                              byte_order=test_byte_order, fmt='2s')
-        convert.convert('test.bin')
+        convert('test.bin')
         result, = self.read_binary_file('test.bin', fmt='2s')
         self.assertEqual('\xcd\xab', result)
 
@@ -75,8 +75,7 @@ class TestConvert(unittest.TestCase):
         """
         Convert from big to little endian
         """
-        convert.convert(self.bsource, 'test.bin', byte_order='little',
-                        fmt=self.fmt)
+        convert(self.bsource, 'test.bin', byte_order='little', fmt=self.fmt)
         result = self.read_binary_file('test.bin', byte_order='little',
                                        fmt=self.fmt)
         self.assertEqual(self.content, result)
@@ -85,8 +84,7 @@ class TestConvert(unittest.TestCase):
         """
         Convert from little to big endian
         """
-        convert.convert(self.lsource, 'test.bin', byte_order='big',
-                        fmt=self.fmt)
+        convert(self.lsource, 'test.bin', byte_order='big', fmt=self.fmt)
         result = self.read_binary_file('test.bin', byte_order='big',
                                        fmt=self.fmt)
         self.assertEqual(self.content, result)
@@ -95,13 +93,13 @@ class TestConvert(unittest.TestCase):
         """
         Calculate format string with wildcard
         """
-        fmt, _ = convert.gen_format_string(self.formats,
-                                           size=os.path.getsize(self.bsource))
+        fmt, _ = utils.gen_format_string(self.formats,
+                                         size=os.path.getsize(self.bsource))
         self.assertEqual('3s3si3si', fmt)
 
     def test_gen_format_string_counts(self):
         """
         Calculate format string with counts given
         """
-        fmt, _ = convert.gen_format_string(['i', '2sf:3', 'h'])
+        fmt, _ = utils.gen_format_string(['i', '2sf:3', 'h'])
         self.assertEqual('i2sf2sf2sfh', fmt)
