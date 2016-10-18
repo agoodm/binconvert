@@ -89,9 +89,9 @@ class TestConvert(unittest.TestCase):
                                        fmt=self.fmt)
         self.assertEqual(self.content, result)
 
-    def test_gen_format_string_wildcard(self):
+    def test_gen_format_string_pound(self):
         """
-        Calculate format string with wildcard
+        Calculate format string with pound
         """
         fmt, _ = utils.gen_format_string(self.formats,
                                          size=os.path.getsize(self.bsource))

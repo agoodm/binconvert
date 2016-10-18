@@ -33,16 +33,16 @@ def main():
                         ' <pattern1>:<count1> <pattern2>:<count2> ...\n Omitting'
                         ' the : assumes a count of 1. As an example, "-f d i2s:2" is'
                         ' equivalent to "-f di2si2s". In addition, one of the'
-                        ' counts may have a special wildcard character (*).'
+                        ' counts may have a special pound character (#).'
                         ' When source is given, the count is automatically'
                         ' converted such that the number of bytes represented by'
                         ' pattern*count fits into the remainder of available bytes.'
-                        ' For example, "bconv a.bin -f i 4s:*" will generate'
+                        ' For example, "bconv a.bin -f i 4s:#" will generate'
                         ' "i4s4s" as a format string when a.bin is 12 bytes.')
     parser.add_argument('-d', '--set-default-format', dest='store', action='store_true',
                         help='If true, the format specified with the -f or -c'
                         ' switch is stored in the ~/.bconvrc file.'
-                        ' Any formats containing a "*" are expanded.')
+                        ' Any formats containing a "#" are expanded if -e is used.')
     parser.add_argument('-c', '--configfile', help='If specified, override the '
                         'default ~/.bconvrc for loading the the format string. '
                         'This is useful in place of the -f switch for really '
@@ -50,16 +50,16 @@ def main():
     parser.add_argument('-p', '--print-format', dest='printf', action='store_true',
                         help='Print the currently used format string. Omitting'
                         ' all other arguments prints the format string stored in'
-                        ' the ~/.bconv file that comes with this program.')
+                        ' the ~/.bconvrc file that comes with this program.')
     parser.add_argument('-v', '--version', action='store_true',
                         help='Print current version of this program and exit.')
     parser.add_argument('-e', '--expand', action='store_true',
-                        help='If set, the special wildcard (*) count will not'
-                        ' be replaced after the actual format pattern count is'
+                        help='If set, the special pound (#) count will'
+                        ' be replaced after the actual format pattern count'
                         ' is calculated. This behavior is not the default because'
                         ' more often than not, uses cases involve multiple binary'
                         ' files with different sizes but common format patterns'
-                        ' which make it more convenient to keep the "*" count intact'
+                        ' which make it more convenient to keep the "#" count intact'
                         ' if setting it as the default format with -d.')
 
     # Now process the arguments
@@ -125,7 +125,7 @@ def main():
             formats = read_from_config_file(configfile)
         except IOError as e:
             # Do this in case default config file is corrupted or doesn't exist.
-            formats = ['h:*']
+            formats = ['h:#']
 
     # Finally we can generate the full format string
     try:

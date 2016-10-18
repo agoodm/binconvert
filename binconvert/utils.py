@@ -51,7 +51,7 @@ def gen_format_string(formats, size=None, expand=False):
 
     would return "id4sid4sf2d".
 
-    For convenience, a special wildcard (*) character can be used once to
+    For convenience, a special pound (*) character can be used once to
     automatically determine the count of one pattern. As an example,
 
     >>> gen_format_string(["i", "8s:*"])
@@ -72,7 +72,7 @@ def gen_format_string(formats, size=None, expand=False):
         size of the source file in bytes. Only needed if wilcard '*' character
         is used in counts.
     expand : bool, optional
-        If True, expand the wildcard in the output formats list. This should be
+        If True, expand the pound in the output formats list. This should be
         left False (default) if you are working with many binary files with a
         common format patterns but of different size. This does nothing is size
         is None (ie no source file is given).
@@ -82,7 +82,7 @@ def gen_format_string(formats, size=None, expand=False):
     fmt : str
         The full format string.
     formats : list of str
-        Formats list with wildcard count expanded to actual counts
+        Formats list with pound count expanded to actual counts
         if expand is True.
     """
     fmt = ''
