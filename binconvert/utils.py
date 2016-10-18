@@ -51,10 +51,10 @@ def gen_format_string(formats, size=None, expand=False):
 
     would return "id4sid4sf2d".
 
-    For convenience, a special pound (*) character can be used once to
+    For convenience, a special pound (#) character can be used once to
     automatically determine the count of one pattern. As an example,
 
-    >>> gen_format_string(["i", "8s:*"])
+    >>> gen_format_string(["i", "8s:#"])
 
     would return "i8s8s" if size is 20 bytes.
 
@@ -65,11 +65,11 @@ def gen_format_string(formats, size=None, expand=False):
         ["<pattern1>:<count1>", "<pattern2>:<count2>", ...], where each count is
         the number of repeated occurences of each format pattern. Each instance
         of ":<countN>" can be omitted for format patterns that only occur once.
-        In the special case that a <countN> "*", the remainder
+        In the special case that a <countN> is "#", the remainder
         of the available bytes in the file is used to automatically calculate
         the count. This can only be done once per list of formats.
     size : int, optional
-        size of the source file in bytes. Only needed if wilcard '*' character
+        size of the source file in bytes. Only needed if wilcard '#' character
         is used in counts.
     expand : bool, optional
         If True, expand the pound in the output formats list. This should be
@@ -98,9 +98,9 @@ def gen_format_string(formats, size=None, expand=False):
         if len(pattern_info) == 1:
             cumsize += struct.calcsize('=' + pattern)
             fmt += pattern
-        elif pattern_info[1][-1] == '*':
+        elif pattern_info[1][-1] == '#':
             if special_pattern:
-                raise struct.error('Wildcard (*) character may only be used once')
+                raise struct.error('Pound (#) character may only be used once')
 
             # We will need the current pattern and count values for later
             # when the remaining size is fully calculated.
@@ -116,7 +116,7 @@ def gen_format_string(formats, size=None, expand=False):
             fmt += result
 
     # We are now ready to allocate the remaining bytes
-    # for the special '*' pattern.
+    # for the special '#' pattern.
     if special_pattern:
         # Make sure source is specified, otherwise return.
         if size is None:
@@ -134,9 +134,9 @@ def gen_format_string(formats, size=None, expand=False):
         result = count*special_pattern
         fmt = fmt.format(result)
 
-        # Update formats list to expand * character.
+        # Update formats list to expand # character.
         if expand:
-            formats[special_index] = formats[special_index].replace('*', str(count))
+            formats[special_index] = formats[special_index].replace('#', str(count))
 
     # Final sanity check: Ensure format string size and source file size match.
     fmt_size = struct.calcsize('=' + fmt)
