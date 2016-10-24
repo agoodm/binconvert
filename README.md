@@ -15,7 +15,7 @@ Although this is a much nicer alternative than forcing the user to manually perf
 Now imagine if this table had hundreds of additional entries. The format string required by `struct` can easily become very long. However, we know that it can be generalized as a *header* which labels each column in the table ("4s7s10s10s") followed by the actual entries of the table ("4si2f"), so it should be possible to generate the format string for an arbitrary number of entries. Using `binconvert`, without even knowing the total size of the file beforehand, we can easily convert its byte-ordering from big to little-endian on an x86 machine using:
 
 ```sh
-bconv a.bin -f 4s7s10s10s 4si2f:*
+bconv a.bin -f 4s7s10s10s 4si2f:#
 ```
 
 In summary, `binconvert`'s main purpose is to extend the functionality of the python [`struct`](https://docs.python.org/3/library/struct.html) module for these use cases by doing the following:
